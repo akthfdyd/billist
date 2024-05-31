@@ -20,6 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     logic = widget.logic;
+    logic.webViewController = webviewController;
     Arc();
     super.initState();
     logic.getBillList();
@@ -35,7 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Container(
-                height: 100,
+                height: 500,
                 child: WebViewWidget(
                   controller: webviewController,
                 ),

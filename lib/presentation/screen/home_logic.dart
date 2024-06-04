@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:arc/arc_request.dart';
 import 'package:billist/data/bill_list_get_vo.dart';
 import 'package:billist/presentation/screen/home_mixin.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:http/http.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 
 class HomeLogic with HomeMixin {
   @override
@@ -38,62 +38,65 @@ class HomeLogic with HomeMixin {
     String crawling = '''
        function getResult(){
          var item = document.getElementsByClassName("search_song");
-         print.postMessage(item);
-         var title = item[0].children[1].children[0].children[1].children[2].children[0].children[4].children[0].innerText.replace('TITLE ','');
-         print.postMessage(title);
-         var artist = item[0].children[1].children[0].children[1].children[2].children[0].children[4].children[1].innerText;
-         print.postMessage(artist);
+         console.log(item);
+         try{
+           var title = item[0].children[1].children[0].children[1].children[2].children[0].children[4].children[0].innerText.replace('TITLE ','');
+           console.log(title);
+           var artist = item[0].children[1].children[0].children[1].children[2].children[0].children[4].children[1].innerText;
+           console.log(artist);
          
-         var result = title + ' - ' + artist;
-         print.postMessage(result);
+           var result = title + ' - ' + artist;
+           console.log(result);
          
-         //geniesearch.postMessage(result);
+           window.flutter_inappwebview.callHandler('geniesearch', result);
+         } catch (error){
+           window.flutter_inappwebview.callHandler('geniesearch', ' ');
+         }
        } 
        
        getResult();
     ''';
 
-    webViewController.addJavaScriptChannel(
-      'geniesearch',
-      onMessageReceived: (JavaScriptMessage message) {
-        addAndCheckSearchFinished(message.message);
-      },
-    );
-    webViewController.addJavaScriptChannel(
-      'print',
-      onMessageReceived: (JavaScriptMessage message) {
-        print(message.message);
-      },
-    );
-    webViewController.setNavigationDelegate(
-      NavigationDelegate(
-        onPageFinished: (String url) {
-          print(crawling);
-          webViewController.runJavaScriptReturningResult(crawling);
-        },
-      ),
-    );
+    webViewController.addJavaScriptHandler(
+        handlerName: 'geniesearch',
+        callback: (args) {
+          addAndCheckSearchFinished(args.first);
+        });
+
+    webViewController.addUserScript(
+        userScript: UserScript(
+            source: crawling,
+            injectionTime: UserScriptInjectionTime.AT_DOCUMENT_END));
+  }
+
+  @override
+  runJavaScript(String script) {
+    webViewController.evaluateJavascript(source: script);
   }
 
   @override
   searchKeyword() async {
+    RegExp regex = RegExp(r"\([^)]+\)");
+    String song = dataList[progress].name ?? '';
+    song = song.replaceAll(regex, '');
+
     String artist = dataList[progress].artist ?? '';
+    artist = artist.replaceAll(regex, '');
     List<String> artistTemp = artist.split(' ');
     if (artistTemp.length > 1) {
       artist = artistTemp[0] + ' ' + artistTemp[1];
     } else {
       artist = artistTemp[0];
     }
-    String keyword = '${dataList[progress].name} - $artist';
+    String keyword = '$song - $artist';
     print(keyword);
     String baseUrl = 'https://www.genie.co.kr/search/searchMain?query=';
     String url = Uri.encodeFull(baseUrl + keyword);
     print(url);
-    Uri uri = Uri.parse(url);
 
     setWebView();
 
-    webViewController.loadRequest(uri);
+    webViewController.loadUrl(urlRequest: URLRequest(url: WebUri(url)));
   }
 
   @override

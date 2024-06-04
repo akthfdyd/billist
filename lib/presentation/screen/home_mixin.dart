@@ -1,6 +1,6 @@
 import 'package:arc/arc_subject.dart';
 import 'package:billist/data/bill_list_get_vo.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 mixin HomeMixin {
   var text = ''.sbj;
@@ -10,13 +10,15 @@ mixin HomeMixin {
   int progress = 0;
   late List<Data> dataList;
 
-  late WebViewController webViewController;
+  late InAppWebViewController webViewController;
 
   getBillList() {}
 
   makeSearchKeyword(BillListGetVO responseModel) {}
 
   setWebView() {}
+
+  runJavaScript(String script) {}
 
   searchKeyword() async {}
 

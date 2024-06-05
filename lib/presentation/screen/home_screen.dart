@@ -53,16 +53,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: 500,
                 child: InAppWebView(
                   key: webViewKey,
-                  // webViewEnvironment: webViewEnvironment,
                   initialUrlRequest:
-                      URLRequest(url: WebUri('https://flutter.dev')),
-                  // initialUrlRequest:
-                  // URLRequest(url: WebUri(Uri.base.toString().replaceFirst("/#/", "/") + 'page.html')),
-                  // initialFile: "assets/index.html",
-                  // initialUserScripts: UnmodifiableListView<UserScript>([]),
+                      URLRequest(url: WebUri('https://www.genie.co.kr')),
                   initialSettings: settings,
-                  // contextMenu: contextMenu,
-                  // pullToRefreshController: pullToRefreshController,
                   onWebViewCreated: (controller) async {
                     webViewController = controller;
                     logic.webViewController = controller;
@@ -75,14 +68,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                   shouldOverrideUrlLoading:
                       (controller, navigationAction) async {
-                    var uri = navigationAction.request.url!;
                     return NavigationActionPolicy.ALLOW;
                   },
                   onLoadStop: (controller, url) async {},
                   onReceivedError: (controller, request, error) {},
-                  onProgressChanged: (controller, progress) {
-                    if (progress == 100) {}
-                  },
+                  onProgressChanged: (controller, progress) {},
                   onUpdateVisitedHistory: (controller, url, isReload) {},
                   onConsoleMessage: (controller, consoleMessage) {
                     print(consoleMessage);
@@ -97,16 +87,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               }),
               Container(height: 20),
-              // InkWell(
-              //     onTap: () {
-              //       logic.runJavaScript('print.postMessage("hello");');
-              //       logic.runJavaScript('getResult();');
-              //     },
-              //     child: Container(
-              //       width: double.infinity,
-              //       height: 40,
-              //       child: Center(child: Text('run')),
-              //     )),
             ],
           ),
         ),
